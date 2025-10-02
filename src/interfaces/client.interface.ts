@@ -1,99 +1,93 @@
-export type Status = 'CHECKOUT_CREATED' | 'CHECKOUT_EXPIRED' | 'CHECKOUT_CANCELED' | 'CHECKOUT_COMPLETED' | 'CHECKOUT_PENDING';
-
 export interface Merchant {
 	token: string;
 }
 
-export interface CreateCheckoutRequest {
-	amount: number;
-	currency: string;
-	purchase_description: string;
-	redirection_url: {
-		success: string;
-		error: string;
-		default: string;
+export interface Address {
+	Country?: string;
+	City?: string;
+	State?: string;
+	PostalCode?: string;
+	AddressDetail?: string;
+}
+
+export interface Customer {
+	FirstName?: string;
+	LastName?: string;
+	ReferenceCode?: string;
+	PhoneNumber?: string;
+	DocumentNumber?: string;
+	DocumentType?: string;
+	Email: string;
+	Address?: Address;
+}
+
+export interface NetworkToken {
+	PaymentMethod: string;
+	[custom: string]: unknown;
+}
+
+export interface CreatePaymentRequest {
+	// Headers are handled by the SDK (merchant token)
+	TrxToken?: string;
+	NetworkToken?: NetworkToken;
+	PaymentMethod?: string;
+	UniqueID?: string;
+	Capture?: boolean;
+	TargetCountryISO: string;
+	Currency: string;
+	Amount: number; // in smallest unit
+	Tip?: number;
+	TaxableAmount?: number;
+	Installments?: number;
+	Order: string;
+	InvoiceNumber?: string;
+	Description?: string;
+	AdditionalData?: string;
+	MetadataIn?: Record<string, unknown>;
+	Customer: Customer;
+	SoftDescriptor?: string;
+
+	// PCI direct card flow (use secure endpoint)
+	CardData?: {
+		CardHolderName: string;
+		Pan: string;
+		CVV: string;
+		Expiration: string; // MM/YY
+		Email: string;
+		Document?: string;
 	};
-	metadata: {
-		me_reference_id: string;
-		customer_info: {
-			name: string;
-			email: string;
-			phone: string;
-		};
-	};
 }
 
-export interface CreateCheckoutResponse {
-	payment_request_id: string;
-	payment_request_url: string;
-	object_type: string;
-	status: Status;
-	last_status_message: string;
-	created_at: string;
-	modified_at: string;
-	expired_at: string;
+export interface ActionObject {
+	// SDK keeps this generic because payloads may vary by payment method
+	[custom: string]: unknown;
 }
 
-export interface GetCheckoutResponse extends CreateCheckoutResponse, CreateCheckoutRequest {
-	expired_at: string;
-	receipt_no: string;
+export interface PaymentMethodObject {
+	[custom: string]: unknown;
 }
 
-interface Transaction {
-	receipt_no: string;
-	created_at: string;
-	location: {
-		longitude: string;
-		latitude: string;
-	};
-	user_email: string;
-	status: string;
-	payment_method: string;
-	sub_type: string;
-	card: {
-		brand: string;
-		issuer: string;
-		last4: string;
-	};
-	currency: string;
-	terms: any;
-	amount: string;
-	tip: string;
-	total: string;
-	merchant_invoice: string;
+export interface CreatePaymentResponse {
+	TransactionId: string;
+	Result: string;
+	Status: string;
+	ErrorCode: string | null;
+	ErrorDescription: string | null;
+	Created: string; // ISO 8601
+	AuthorizationDate?: string | null;
+	AuthorizationCode?: string | null;
+	Amount: number;
+	Currency: string;
+	Installments?: number | null;
+	TaxableAmount?: number | null;
+	Tip?: number | null;
+	Url?: string;
+	MetadataOut?: Record<string, unknown> | null;
+	Action?: ActionObject | null;
+	PaymentMethod?: PaymentMethodObject | null;
 }
 
-interface QueryPagination {
-	pagination_token: string;
-	limit: string;
-	from: string;
-	to: string;
-	last4: string;
-	status: string;
-}
-
-interface MetaPagination {
-	limit: string;
-	pagination_token: string;
-	from: string;
-	to: string;
-	item_type: string;
-}
-
-export interface GetTransactionsResponse {
-	items: Transaction[];
-	query: QueryPagination;
-	response_messages: string[];
-	meta: MetaPagination;
-}
-
-export interface GetTransactionResponse {
-	query: {
-		receipt_no: string;
-	};
-	meta: {
-		item_type: string;
-	};
-	item: Transaction;
-	response_messages: string[];
+export interface ErrorResponse {
+	ErrorCode: string;
+	ErrorDescription: string;
 }

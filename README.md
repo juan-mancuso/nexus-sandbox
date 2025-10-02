@@ -1,5 +1,3 @@
-![Logo](./logo.jpg)
-
 # SDK {{clientName}}
 
 A TypeScript SDK for payment services integration, providing a simple and type-safe interface for authentication, checkout creation, and transaction management.
@@ -13,18 +11,6 @@ A TypeScript SDK for payment services integration, providing a simple and type-s
 - 🛠️ **Built-in Utilities** - Logging, validation, and error handling
 - 🌐 **Multiple Environments** - Development, stage, and production
 - 📝 **Complete Documentation** - Examples and usage guides
-
-## 📦 Installation
-
-```bash
-npm install boilerplate-sdk --registry https://npm-registry.conexa.ai
-```
-
-Or using yarn:
-
-```bash
-yarn add boilerplate-sdk --registry https://npm-registry.conexa.ai
-```
 
 ## 🏁 Quick Start
 
@@ -206,47 +192,6 @@ Checkouts can have the following statuses:
 - Node.js >= 22.0.0
 - Yarn (recommended)
 
-### Development Installation
-
-```bash
-# Clone the repository
-git clone <repository-url>
-cd boilerplate-sdk
-
-# Install dependencies
-yarn install
-
-# Build the project
-yarn build
-
-# Run in development mode (watch mode)
-yarn build:watch
-```
-
-### Available Scripts
-
-```bash
-# Building
-yarn build                    # Build for production
-yarn build:watch             # Build in watch mode
-
-# Testing
-yarn test                    # Run tests
-yarn typecheck              # Check TypeScript types
-
-# Code Quality
-yarn lint                    # Run linter
-yarn lint:fix               # Fix linting errors
-yarn prettier               # Check formatting
-yarn prettier:fix           # Fix formatting
-
-# Releases
-yarn release                 # Automatic release
-yarn release:patch          # Patch release
-yarn release:minor          # Minor release
-yarn release:major          # Major release
-```
-
 ## 📁 Project Structure
 
 ```
@@ -269,57 +214,6 @@ boilerplate-sdk/
 └── package.json
 ```
 
-## 🔄 Git Workflow
-
-We use [GitFlow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) as our branching model.
-
-### Branch naming convention:
-
-- `feature/feature-name` - New features
-- `fix/fix-name` - Bug fixes
-- `chore/chore-name` - Maintenance tasks
-- `docs/docs-name` - Documentation
-- `refactor/refactor-name` - Refactoring
-- `test/test-name` - Tests
-
-### Commits
-
-We use [Conventional Commits](https://www.conventionalcommits.org/):
-
-```bash
-# Valid commit examples
-feat(checkout): add support for multiple currencies
-fix(auth): handle token expiration correctly
-docs(readme): update installation instructions
-chore(deps): update dependencies
-```
-
-### Available commit types:
-
-- `feat` - New feature
-- `fix` - Bug fix
-- `docs` - Documentation
-- `style` - Code formatting
-- `refactor` - Refactoring
-- `test` - Tests
-- `chore` - Maintenance tasks
-- `perf` - Performance improvements
-- `ci` - Continuous integration
-- `build` - Build system
-- `revert` - Revert changes
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-yarn test
-
-# Run tests with coverage
-yarn test --coverage
-
-# Run tests in watch mode
-yarn test --watch
-```
 
 ## 📖 Usage Examples
 
@@ -441,33 +335,3 @@ setAppConfig({
   userAgent: 'My App v1.0.0'
 });
 ```
-
-## 🚀 Publishing
-
-```bash
-# Publish new version
-yarn release
-
-# Publish to npm registry
-yarn publish:registry
-```
-
-## 📄 License
-
-MIT
-
-## 🤝 Contributing
-
-1. Fork the project
-2. Create a feature branch (`git checkout -b feature/new-feature`)
-3. Commit your changes (`git commit -m 'feat: add new feature'`)
-4. Push to the branch (`git push origin feature/new-feature`)
-5. Open a Pull Request
-
-## 📞 Support
-
-For technical support or questions, contact the Conexa development team.
-
----
-
-Built with ❤️ by [Conexa](https://conexa.ai)

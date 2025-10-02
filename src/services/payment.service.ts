@@ -57,10 +57,10 @@ const createPayment = async (merchant: Merchant, payload: CreatePaymentRequest):
 		throw new PaymentError('Secure API URL not configured for PCI direct card flow');
 	}
 
-	const headers = getHeaders(merchant.token);
-	if ((payload as any).TrxToken && typeof (payload as any).TrxToken === 'string') {
+	const headers = getHeaders(merchant.token) as Record<string, string>;
+	if (payload.TrxToken && typeof payload.TrxToken === 'string') {
 		// TrxToken is expected as header in the Bamboo API
-		(headers as Record<string, string>)['TrxToken'] = (payload as any).TrxToken;
+		headers['TrxToken'] = payload.TrxToken;
 	}
 
 	const httpService = new HttpService('', {

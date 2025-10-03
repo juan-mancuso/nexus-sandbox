@@ -30,3 +30,58 @@ export function validationFormat(format: any) {
 export function isValidStatusCode(statusCode: unknown): boolean {
 	return !!statusCode && typeof statusCode === 'number' && statusCode >= 100 && statusCode < 600;
 }
+
+// BambooPayment specific validators
+export function validateCreateTransactionPayload(payload: any) {
+	if (!payload || typeof payload !== 'object') {
+		throw new Error('Invalid payload: expected object');
+	}
+
+	const required = ['TargetCountryISO', 'Currency', 'Amount', 'Order'];
+
+	for (const field of required) {
+		if (payload[field] === undefined || payload[field] === null) {
+			throw new Error(`Missing required field: ${field}`);
+		}
+	}
+
+	if (typeof payload.Amount !== 'number' || payload.Amount <= 0) {
+		throw new Error('Amount must be a number greater than zero');
+	}
+
+	if (!payload.Customer || typeof payload.Customer !== 'object') {
+		// CommerceToken flows may omit Customer but our SDK expects Customer in most cases
+		throw new Error('Customer object is required');
+	}
+
+	if (!payload.Customer.Email || typeof payload.Customer.Email !== 'string') {
+		throw new Error('Customer.Email is required');
+	}
+
+	// If CardData is present, validate required card fields
+	if (payload.CardData) {
+		const cd = payload.CardData;
+		const cardRequired = ['CardHolderName', 'Pan', 'CVV', 'Expiration', 'Email'];
+		for (const field of cardRequired) {
+			if (!cd[field]) {
+				throw new Error(`CardData.${field} is required for direct PCI purchase`);
+			}
+		}
+	}
+
+	return true;
+}
+
+export function validateCancelPayload(payload: any) {
+	if (!payload) return true;
+
+	if (typeof payload !== 'object') {
+		throw new Error('Invalid cancel payload');
+	}
+
+	if (payload.Amount !== undefined && typeof payload.Amount !== 'number') {
+		throw new Error('Cancel Amount must be a number');
+	}
+
+	return true;
+}

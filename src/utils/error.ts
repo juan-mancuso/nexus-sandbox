@@ -72,3 +72,6 @@ export class CustomError<M = any, D = any> extends Error {
 		Logger.warn(this);
 	}
 }
+
+// Canonical error code used for not implemented features (e.g. refund placeholder)
+export const NOT_IMPLEMENTED_ERROR_CODE = 10001;

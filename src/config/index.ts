@@ -1,14 +1,22 @@
 import { AppConfigType } from '../interfaces';
 
 const apiUrls = {
-	test: 'https://api-gw.payclip.com',
-	development: 'https://api-gw.payclip.com',
-	stage: 'https://api-gw.payclip.com',
-	production: 'https://api-gw.payclip.com'
+	test: 'https://api.bamboopayment.com',
+	development: 'https://api.bamboopayment.com',
+	stage: 'https://api.bamboopayment.com',
+	production: 'https://api.bamboopayment.com'
+};
+
+const secureApiUrls = {
+	test: 'https://secure-api.bamboopayment.com',
+	development: 'https://secure-api.bamboopayment.com',
+	stage: 'https://secure-api.bamboopayment.com',
+	production: 'https://secure-api.bamboopayment.com'
 };
 
 const AppConfig: AppConfigType = {
 	apiUrl: apiUrls.development,
+	secureApiUrl: secureApiUrls.development,
 	debug: true,
 	userAgent: 'Example SDK',
 	env: 'development'
@@ -19,6 +27,7 @@ export const setAppConfig = (newConfig: Partial<AppConfigType>): void => {
 
 	AppConfig.debug = !!debug;
 	AppConfig.apiUrl = apiUrls[env];
+	AppConfig.secureApiUrl = secureApiUrls[env];
 	AppConfig.env = env;
 	AppConfig.userAgent = userAgent ?? '';
 };

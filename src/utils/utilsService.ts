@@ -13,22 +13,43 @@ export function getHeaders(token: string) {
 	};
 }
 
-export const handleError = (error: any) => {
+export function getBearerHeaders(token: string) {
+	const { userAgent } = getAppConfig();
+
+	return {
+		Authorization: `Bearer ${token}`,
+		'User-Agent': `${userAgent}`,
+		'Content-Type': 'application/json'
+	};
+}
+
+export function getPublicHeaders() {
+	const { userAgent } = getAppConfig();
+
+	return {
+		'User-Agent': `${userAgent}`,
+		'Content-Type': 'application/json'
+	};
+}
+
+export const handleError = (error: unknown) => {
 	const { debug } = getAppConfig();
 
 	if (debug) {
 		Logger.error(error);
 	}
 
-	// TODO: IMPLEMENT THIS
 	if (isAxiosError(error)) {
 		const { message, status: statusCode, response } = error;
 		const { data, status } = response || {};
 
-		throw new CustomError(message, { statusCode: status ?? statusCode ?? HttpStatusCode.InternalServerError, data: data ?? error });
+		throw new CustomError(typeof message === 'string' ? message : 'Request error', {
+			statusCode: (status ?? statusCode) as number,
+			data: data ?? error
+		});
 	}
 
-	throw new CustomError(HttpStatusCode[HttpStatusCode.InternalServerError], { statusCode: HttpStatusCode.InternalServerError, data: error });
+	throw new CustomError('Internal Server Error', { statusCode: HttpStatusCode.InternalServerError, data: error });
 };
 
 export const generateToken = (apiKey: string, secretKey: string): string => {

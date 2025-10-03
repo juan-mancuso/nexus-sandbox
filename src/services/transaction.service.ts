@@ -11,6 +11,7 @@ import {
 	GetPaymentResponse,
 	RefundPaymentResponse
 } from '../interfaces/bamboopayments.interface';
+import { CustomError, NOT_IMPLEMENTED_ERROR_CODE } from '../utils/error';
 
 /**
  * Creates a payment (purchase) in BambooPayments.
@@ -156,7 +157,11 @@ const cancelTransaction = async (
  * Refund is not implemented in BambooPayments SDK yet — placeholder that throws NOT_IMPLEMENTED.
  */
 const refundTransaction = async (_merchant: Merchant): Promise<RefundPaymentResponse> => {
-	throw new Error('Refund not implemented.');
+	throw new CustomError('Refund not implemented for BambooPayments SDK', {
+		code: NOT_IMPLEMENTED_ERROR_CODE,
+		statusCode: 501,
+		data: { message: 'Refund endpoint not available in this SDK placeholder' }
+	});
 };
 
 export default class TransactionService {

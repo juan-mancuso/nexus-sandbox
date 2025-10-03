@@ -1,10 +1,19 @@
 import { AppConfigType } from '../interfaces';
 
-const apiUrls = {
-	test: 'https://api-gw.payclip.com',
-	development: 'https://api-gw.payclip.com',
-	stage: 'https://api-gw.payclip.com',
-	production: 'https://api-gw.payclip.com'
+const apiUrls: Record<string, string> = {
+	// BambooPayments environments
+	test: 'https://api.bamboopayment.com',
+	development: 'https://api.bamboopayment.com',
+	stage: 'https://api.bamboopayment.com',
+	production: 'https://api.bamboopayment.com'
+};
+
+// Also expose the secure API host used for PCI direct card-data flow when requested
+export const secureApiUrls: Record<string, string> = {
+	test: 'https://secure-api.bamboopayment.com',
+	development: 'https://secure-api.bamboopayment.com',
+	stage: 'https://secure-api.bamboopayment.com',
+	production: 'https://secure-api.bamboopayment.com'
 };
 
 const AppConfig: AppConfigType = {

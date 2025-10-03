@@ -28,7 +28,7 @@ export interface CardData {
 
 export interface NetworkToken {
 	PaymentMethod: string; // mandatory when sending NetworkToken
-	[extra: string]: any;
+	[extra: string]: unknown;
 }
 
 export interface CreateTransactionRequest {

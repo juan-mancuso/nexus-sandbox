@@ -1,32 +1,26 @@
-export function needFormat(data: unknown) {
-	return typeof data !== 'string' && typeof data !== 'number';
+import { CreatePaymentRequest } from "../interfaces/bamboopayments.interface";
+
+export function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
 }
 
-export function isHttpResponse(obj: any) {
-	return (
-		!!obj &&
-		Object.prototype.hasOwnProperty.call(obj, 'data') &&
-		Object.prototype.hasOwnProperty.call(obj, 'status') &&
-		Object.prototype.hasOwnProperty.call(obj, 'statusText') &&
-		Object.prototype.hasOwnProperty.call(obj, 'headers') &&
-		Object.prototype.hasOwnProperty.call(obj, 'config') &&
-		Object.prototype.hasOwnProperty.call(obj, 'request')
-	);
+export function isValidAmount(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value) && value > 0 && Math.floor(value) === value;
 }
 
-export function validationFormat(format: any) {
-	return {
-		isNeedFormat: needFormat(format),
-		isHttpInstance: isHttpResponse(format)
-	};
+export function isValidEmail(value: unknown): value is string {
+  if (typeof value !== "string") return false;
+  // Very small / permissive email regexp — advisory only
+  return /.+@.+\..+/.test(value);
 }
 
-/**
- * Checks if a given status code is valid based on being a number within the valid HTTP status code range (100 to 599).
- *
- * @param {unknown} statusCode - The status code to be validated.
- * @returns {boolean} Returns true if the status code is valid; otherwise, returns false.
- */
-export function isValidStatusCode(statusCode: unknown): boolean {
-	return !!statusCode && typeof statusCode === 'number' && statusCode >= 100 && statusCode < 600;
+// Advisory validator: returns an array of validation messages. Does not throw.
+export function validateCreatePaymentRequest(payload: CreatePaymentRequest): string[] {
+  const errors: string[] = [];
+  if (!isNonEmptyString(payload.TargetCountryISO)) errors.push("TargetCountryISO is required and must be a non-empty string");
+  if (!isNonEmptyString(payload.Currency)) errors.push("Currency is required and must be a non-empty string");
+  if (!isValidAmount(payload.Amount)) errors.push("Amount is required, must be an integer in the smallest unit and greater than zero");
+  if (!isNonEmptyString(payload.Order)) errors.push("Order is required and must be a non-empty string");
+  if (!payload.Customer || !isValidEmail(payload.Customer.Email)) errors.push("Customer.email is required and must be a valid email");
+  return errors;
 }

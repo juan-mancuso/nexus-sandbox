@@ -1,18 +1,34 @@
-import TransactionService from './transaction.service';
-import { generateToken, handleError } from '../utils/utilsService';
+import { AuthRequest, AuthResponse } from '../interfaces/client.interface';
+import { getAppConfig } from '../config';
+import { handleError, getPublicHeaders } from '../utils/utilsService';
+import { Logger } from '../utils/logger';
+import { HttpService } from '../utils/httpService';
+import { CustomError } from '../utils/error';
 
-const authenticate = async (apiKey: string, secretKey: string) => {
+const authenticate = async (username: string, password: string): Promise<string> => {
+	const { apiUrl, debug } = getAppConfig();
+
+	const httpService = new HttpService('', {
+		baseURL: `${apiUrl}/`,
+		headers: getPublicHeaders()
+	});
+
 	try {
-		const token = generateToken(apiKey, secretKey);
+		const body: AuthRequest = { username, password };
 
-		const service = new TransactionService(token);
-		const response = await service.getTransactions();
+		const response = await httpService.post<AuthResponse>('v2/stores/companies/token', { data: body });
 
-		if (!response || !response.items) {
-			throw new Error('Invalid credentials');
+		if (debug) {
+			Logger.info(response);
 		}
 
-		return token;
+		const data = response.data;
+
+		if (!data || typeof data.access_token !== 'string') {
+			throw new CustomError('Invalid authentication response', { statusCode: response.status, data });
+		}
+
+		return data.access_token;
 	} catch (error) {
 		return handleError(error);
 	}

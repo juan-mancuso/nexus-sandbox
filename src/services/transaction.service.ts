@@ -1,13 +1,14 @@
-import { GetTransactionsResponse, Merchant } from '../interfaces/client.interface';
+import { Merchant, CreatePaymentRequest, CreatePaymentResponse, GetPaymentResponse, RefundPaymentRequest, RefundPaymentResponse } from '../interfaces/client.interface';
 import { getAppConfig } from '../config';
-import { handleError, getHeaders } from '../utils/utilsService';
-import { HttpService } from '../utils/httpService';
+import { handleError, getBearerHeaders } from '../utils/utilsService';
 import { Logger } from '../utils/logger';
+import { HttpService } from '../utils/httpService';
+import { CustomError } from '../utils/error';
 
-const getTransactions = async (merchant: Merchant) => {
+const createPayment = async (merchant: Merchant, payment: CreatePaymentRequest): Promise<CreatePaymentResponse> => {
 	const { apiUrl, debug } = getAppConfig();
 
-	const headers = getHeaders(merchant.token);
+	const headers = getBearerHeaders(merchant.token);
 
 	const httpService = new HttpService('', {
 		baseURL: `${apiUrl}/`,
@@ -15,7 +16,7 @@ const getTransactions = async (merchant: Merchant) => {
 	});
 
 	try {
-		const response = await httpService.get<GetTransactionsResponse>('payments');
+		const response = await httpService.post<CreatePaymentResponse>('v2/payment-requests/', { data: payment });
 
 		if (debug) {
 			Logger.info(response);
@@ -27,18 +28,18 @@ const getTransactions = async (merchant: Merchant) => {
 	}
 };
 
-const getTransaction = async (merchant: Merchant, receiptNo: string) => {
+const getPaymentDetails = async (merchant: Merchant, paymentRequestId: string): Promise<GetPaymentResponse> => {
 	const { apiUrl, debug } = getAppConfig();
 
-	const headers = getHeaders(merchant.token);
+	const headers = getBearerHeaders(merchant.token);
 
-	const httpService = new HttpService('payments/receipt-no', {
+	const httpService = new HttpService('', {
 		baseURL: `${apiUrl}/`,
 		headers
 	});
 
 	try {
-		const response = await httpService.get<GetTransactionsResponse>(receiptNo);
+		const response = await httpService.get<GetPaymentResponse>(`v2/payment-requests/${encodeURIComponent(paymentRequestId)}/data`);
 
 		if (debug) {
 			Logger.info(response);
@@ -48,6 +49,34 @@ const getTransaction = async (merchant: Merchant, receiptNo: string) => {
 	} catch (error) {
 		return handleError(error);
 	}
+};
+
+const refundPayment = async (merchant: Merchant, paymentRequestId: string, body?: RefundPaymentRequest): Promise<RefundPaymentResponse> => {
+	const { apiUrl, debug } = getAppConfig();
+
+	const headers = getBearerHeaders(merchant.token);
+
+	const httpService = new HttpService('', {
+		baseURL: `${apiUrl}/`,
+		headers
+	});
+
+	try {
+		const response = await httpService.post<RefundPaymentResponse>(`v2/payment-requests/${encodeURIComponent(paymentRequestId)}/refund`, { data: body ?? {} });
+
+		if (debug) {
+			Logger.info(response);
+		}
+
+		return response.data;
+	} catch (error) {
+		return handleError(error);
+	}
+};
+
+const cancelPayment = async () => {
+	// Not supported by the provided API
+	throw new CustomError('Cancel payment is not implemented for modo API', { statusCode: 501 });
 };
 
 export default class TransactionService {
@@ -61,7 +90,11 @@ export default class TransactionService {
 		};
 	}
 
-	getTransactions = () => getTransactions(this.merchant);
+	createPayment = (payment: CreatePaymentRequest) => createPayment(this.merchant, payment);
 
-	getTransaction = (receiptNo: string) => getTransaction(this.merchant, receiptNo);
+	getPaymentDetails = (paymentRequestId: string) => getPaymentDetails(this.merchant, paymentRequestId);
+
+	refundPayment = (paymentRequestId: string, body?: RefundPaymentRequest) => refundPayment(this.merchant, paymentRequestId, body);
+
+	cancelPayment = () => cancelPayment();
 }

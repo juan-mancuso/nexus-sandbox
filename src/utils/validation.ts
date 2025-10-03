@@ -30,3 +30,19 @@ export function validationFormat(format: any) {
 export function isValidStatusCode(statusCode: unknown): boolean {
 	return !!statusCode && typeof statusCode === 'number' && statusCode >= 100 && statusCode < 600;
 }
+
+// Lightweight validators for BambooPayments requests
+export function isPositiveInteger(value: unknown): boolean {
+	return typeof value === 'number' && Number.isInteger(value) && value > 0;
+}
+
+export function isNonEmptyString(value: unknown): boolean {
+	return typeof value === 'string' && value.trim().length > 0;
+}
+
+export function isEmail(value: unknown): boolean {
+	if (!isNonEmptyString(value)) return false;
+	// simple RFC-like email check
+	const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	return re.test(String(value).toLowerCase());
+}

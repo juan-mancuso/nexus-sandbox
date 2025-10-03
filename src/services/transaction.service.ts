@@ -40,6 +40,9 @@ const createTransaction = async (merchant: Merchant, payload: CreateTransactionR
 	}
 };
 
+// Aliased function requested by API consumers: createPayment
+const createPayment = (merchant: Merchant, payload: CreateTransactionRequest) => createTransaction(merchant, payload);
+
 const getTransactionById = async (merchant: Merchant, transactionId: string) => {
 	const { apiUrl, debug } = getAppConfig();
 
@@ -64,6 +67,9 @@ const getTransactionById = async (merchant: Merchant, transactionId: string) => 
 		return handleError(error);
 	}
 };
+
+// Aliased function requested by API consumers: getPaymentDetails
+const getPaymentDetails = (merchant: Merchant, transactionId: string) => getTransactionById(merchant, transactionId);
 
 const getTransactionByOrder = async (merchant: Merchant, order: string) => {
 	const { apiUrl, debug } = getAppConfig();
@@ -138,6 +144,9 @@ const cancelTransaction = async (merchant: Merchant, transactionId: string, body
 	}
 };
 
+// Aliased function requested by API consumers: cancelPayment
+const cancelPayment = (merchant: Merchant, transactionId: string, body?: CancelTransactionRequest) => cancelTransaction(merchant, transactionId, body);
+
 // RefundTransaction maps to cancelTransaction partial amount (BambooPayment exposes cancel endpoint for refunds)
 const refundTransaction = async (merchant: Merchant, transactionId: string, amount: number) => {
 	if (!transactionId) return handleError(new Error('TransactionId is required'));
@@ -166,13 +175,22 @@ export default class TransactionService {
 
 	createTransaction = (payload: CreateTransactionRequest) => createTransaction(this.merchant, payload);
 
+	// Alias for createTransaction
+	createPayment = (payload: CreateTransactionRequest) => createPayment(this.merchant, payload);
+
 	getTransaction = (transactionId: string) => getTransactionById(this.merchant, transactionId);
+
+	// Alias for getTransaction
+	getPaymentDetails = (transactionId: string) => getPaymentDetails(this.merchant, transactionId);
 
 	getTransactionByOrder = (order: string) => getTransactionByOrder(this.merchant, order);
 
 	getTransactionByUniqueId = (uniqueId: string) => getTransactionByUniqueId(this.merchant, uniqueId);
 
 	cancelTransaction = (transactionId: string, body?: CancelTransactionRequest) => cancelTransaction(this.merchant, transactionId, body);
+
+	// Alias for cancelTransaction
+	cancelPayment = (transactionId: string, body?: CancelTransactionRequest) => cancelPayment(this.merchant, transactionId, body);
 
 	refundTransaction = (transactionId: string, amount: number) => refundTransaction(this.merchant, transactionId, amount);
 }

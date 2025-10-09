@@ -1,10 +1,12 @@
 import { AppConfigType } from '../interfaces';
 
 const apiUrls = {
-	test: 'https://api-gw.payclip.com',
+	// Default development API (unchanged)
 	development: 'https://api-gw.payclip.com',
-	stage: 'https://api-gw.payclip.com',
-	production: 'https://api-gw.payclip.com'
+	test: 'https://api-gw.payclip.com',
+	// For modo-testing2 integration use the provided stage and production hosts
+	stage: 'https://merchants.preprod.playdigital.com.ar',
+	production: 'https://merchants.playdigital.com.ar'
 };
 
 const AppConfig: AppConfigType = {

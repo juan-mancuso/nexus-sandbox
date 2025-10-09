@@ -30,3 +30,23 @@ export function validationFormat(format: any) {
 export function isValidStatusCode(statusCode: unknown): boolean {
 	return !!statusCode && typeof statusCode === 'number' && statusCode >= 100 && statusCode < 600;
 }
+
+// Simple helpers for modo-testing2 — lightweight validators (not enforced before requests per SDK guidelines)
+export const validateAmount = (value: unknown): boolean => {
+	if (typeof value !== 'number') return false;
+	// ensure at most 2 decimals
+	const rounded = Math.round(value * 100) / 100;
+	return Math.abs(value - rounded) < Number.EPSILON || value === rounded;
+};
+
+export const validateCurrency = (currency: unknown): boolean => {
+	if (typeof currency !== 'string') return false;
+	// basic check — allow 'ARS' for this integration
+	return currency.toUpperCase() === 'ARS';
+};
+
+export const validateISODate = (dateStr: unknown): boolean => {
+	if (typeof dateStr !== 'string') return false;
+	// basic ISO8601 check (YYYY-MM-DD or datetime)
+	return /^\d{4}-\d{2}-\d{2}(T.*Z?)?$/.test(dateStr);
+};

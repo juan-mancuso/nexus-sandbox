@@ -7,7 +7,7 @@ export function getHeaders(token: string) {
 	const { userAgent } = getAppConfig();
 
 	return {
-		Authorization: `Basic ${token}`,
+		Authorization: `Bearer ${token}`,
 		'User-Agent': `${userAgent}`,
 		'Content-Type': 'application/json'
 	};

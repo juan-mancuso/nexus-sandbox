@@ -107,3 +107,19 @@ export default class TransactionService {
 
 	cancelTransaction = (paymentRequestId: string) => cancelTransaction(this.merchant, paymentRequestId);
 }
+
+// Convenience standalone functions matching requested naming in integration guides
+export const createPayment = (accessToken: string, payment: CreatePaymentRequest) => {
+	const svc = new TransactionService(accessToken);
+	return svc.createTransaction(payment);
+};
+
+export const getPaymentDetails = (accessToken: string, paymentRequestId: string) => {
+	const svc = new TransactionService(accessToken);
+	return svc.getTransaction(paymentRequestId);
+};
+
+export const cancelPayment = (accessToken: string, paymentRequestId: string) => {
+	const svc = new TransactionService(accessToken);
+	return svc.cancelTransaction(paymentRequestId);
+};

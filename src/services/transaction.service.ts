@@ -1,21 +1,29 @@
-import { GetTransactionsResponse, Merchant } from '../interfaces/client.interface';
+import { Merchant } from '../interfaces/client.interface';
 import { getAppConfig } from '../config';
 import { handleError, getHeaders } from '../utils/utilsService';
 import { HttpService } from '../utils/httpService';
 import { Logger } from '../utils/logger';
+import {
+	CreatePaymentRequest,
+	CreatePaymentResponse,
+	RefundResponse,
+	RefundRequest,
+	PaymentDetailsResponse
+} from '../interfaces/modo.interface';
 
-const getTransactions = async (merchant: Merchant) => {
+const BASE_PATH = 'v2/payment-requests/';
+
+const createTransaction = async (merchant: Merchant, payment: CreatePaymentRequest) => {
 	const { apiUrl, debug } = getAppConfig();
-
 	const headers = getHeaders(merchant.token);
 
-	const httpService = new HttpService('', {
+	const httpService = new HttpService(BASE_PATH, {
 		baseURL: `${apiUrl}/`,
 		headers
 	});
 
 	try {
-		const response = await httpService.get<GetTransactionsResponse>('payments');
+		const response = await httpService.post<CreatePaymentResponse>('', { data: payment });
 
 		if (debug) {
 			Logger.info(response);
@@ -27,18 +35,17 @@ const getTransactions = async (merchant: Merchant) => {
 	}
 };
 
-const getTransaction = async (merchant: Merchant, receiptNo: string) => {
+const getTransaction = async (merchant: Merchant, paymentRequestId: string) => {
 	const { apiUrl, debug } = getAppConfig();
-
 	const headers = getHeaders(merchant.token);
 
-	const httpService = new HttpService('payments/receipt-no', {
+	const httpService = new HttpService(BASE_PATH, {
 		baseURL: `${apiUrl}/`,
 		headers
 	});
 
 	try {
-		const response = await httpService.get<GetTransactionsResponse>(receiptNo);
+		const response = await httpService.get<PaymentDetailsResponse>(`${paymentRequestId}/data`);
 
 		if (debug) {
 			Logger.info(response);
@@ -48,6 +55,37 @@ const getTransaction = async (merchant: Merchant, receiptNo: string) => {
 	} catch (error) {
 		return handleError(error);
 	}
+};
+
+const refundTransaction = async (merchant: Merchant, paymentRequestId: string, refund?: RefundRequest) => {
+	const { apiUrl, debug } = getAppConfig();
+	const headers = getHeaders(merchant.token);
+
+	const httpService = new HttpService(BASE_PATH, {
+		baseURL: `${apiUrl}/`,
+		headers
+	});
+
+	try {
+		const response = await httpService.post<RefundResponse>(`${paymentRequestId}/refund`, { data: refund ?? {} });
+
+		if (debug) {
+			Logger.info(response);
+		}
+
+		return response.data;
+	} catch (error) {
+		return handleError(error);
+	}
+};
+
+/**
+ * cancelTransaction: Modo API does not provide a dedicated cancel endpoint in the analysis.
+ * We implement cancel as a full refund (no amount provided) by calling the refund endpoint
+ * with no amount. If merchant requires a different behavior, replace this implementation.
+ */
+const cancelTransaction = async (merchant: Merchant, paymentRequestId: string) => {
+	return refundTransaction(merchant, paymentRequestId);
 };
 
 export default class TransactionService {
@@ -61,7 +99,11 @@ export default class TransactionService {
 		};
 	}
 
-	getTransactions = () => getTransactions(this.merchant);
+	createTransaction = (payment: CreatePaymentRequest) => createTransaction(this.merchant, payment);
 
-	getTransaction = (receiptNo: string) => getTransaction(this.merchant, receiptNo);
+	getTransaction = (paymentRequestId: string) => getTransaction(this.merchant, paymentRequestId);
+
+	refundTransaction = (paymentRequestId: string, refund?: RefundRequest) => refundTransaction(this.merchant, paymentRequestId, refund);
+
+	cancelTransaction = (paymentRequestId: string) => cancelTransaction(this.merchant, paymentRequestId);
 }

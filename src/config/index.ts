@@ -1,10 +1,10 @@
 import { AppConfigType } from '../interfaces';
 
 const apiUrls = {
-	test: 'https://api-gw.payclip.com',
-	development: 'https://api-gw.payclip.com',
-	stage: 'https://api-gw.payclip.com',
-	production: 'https://api-gw.payclip.com'
+	test: 'https://merchants.preprod.playdigital.com.ar',
+	development: 'https://merchants.preprod.playdigital.com.ar',
+	stage: 'https://merchants.preprod.playdigital.com.ar',
+	production: 'https://merchants.playdigital.com.ar'
 };
 
 const AppConfig: AppConfigType = {

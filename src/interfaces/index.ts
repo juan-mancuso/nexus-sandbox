@@ -4,3 +4,5 @@ export type AppConfigType = {
 	env: 'production' | 'stage' | 'development' | 'test';
 	userAgent: string;
 };
+
+export * from './modo.interface';

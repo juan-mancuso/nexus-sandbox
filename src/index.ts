@@ -5,6 +5,7 @@ import { authenticate } from './services/auth.service';
 import CheckoutService from './services/checkout.service';
 import TransactionService from './services/transaction.service';
 import * as ClientTypes from './interfaces/client.interface';
+import * as BambooTypes from './interfaces/bamboopayments.interface';
 
 class ClientSDK {
 	merchant: {
@@ -27,6 +28,7 @@ class ClientSDK {
 export {
 	ClientSDK,
 	ClientTypes,
+	BambooTypes,
 	authenticate,
 
 	// SDK Configuration

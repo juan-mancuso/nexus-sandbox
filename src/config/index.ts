@@ -1,10 +1,11 @@
 import { AppConfigType } from '../interfaces';
 
 const apiUrls = {
-	test: 'https://api-gw.payclip.com',
-	development: 'https://api-gw.payclip.com',
-	stage: 'https://api-gw.payclip.com',
-	production: 'https://api-gw.payclip.com'
+	// Map SDK env names to BambooPayments endpoints
+	test: 'https://api.stage.bamboopayment.com',
+	development: 'https://api.stage.bamboopayment.com',
+	stage: 'https://api.stage.bamboopayment.com',
+	production: 'https://api.bamboopayment.com'
 };
 
 const AppConfig: AppConfigType = {

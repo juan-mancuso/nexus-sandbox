@@ -27,13 +27,18 @@ export const handleError = (error: unknown) => {
 	}
 
 	if (isAxiosError(error)) {
-		const axiosError = error as any; // narrowed below with guards
-		const { message } = axiosError;
-		const response = axiosError.response as { data?: unknown; status?: number } | undefined;
-		const statusCode = response?.status ?? axiosError.status ?? HttpStatusCode.InternalServerError;
-		const data = response?.data ?? axiosError;
+		type AxiosLikeError = {
+			message?: string;
+			response?: { data?: unknown; status?: number };
+			status?: number;
+		};
 
-		throw new CustomError(typeof message === 'string' ? message : 'Request failed', {
+		const axiosError = error as AxiosLikeError;
+		const message = axiosError.message ?? 'Request failed';
+		const statusCode = axiosError.response?.status ?? axiosError.status ?? HttpStatusCode.InternalServerError;
+		const data = axiosError.response?.data ?? axiosError;
+
+		throw new CustomError(message, {
 			statusCode,
 			data
 		});

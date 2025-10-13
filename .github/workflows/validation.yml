@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+    branches-ignore:
+      - 'main'
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22] # or [18, 20] if you want to test multiple versions
+
+    steps:
+      - name: 🧰 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+
+      - name: 📦 Install dependencies
+        run: npm run install:all
+        # or `pnpm install --frozen-lockfile` if using pnpm
+        # or `yarn install --frozen-lockfile` if using yarn
+
+      #- name: 🧹 Lint
+       # run: npm run lint
+        # make sure your package.json has "lint": "eslint ."
+
+      #- name: 🧪 Run tests
+       # run: npm test
+        # e.g. for Jest, Vitest, etc.
+
+      - name: 🏗️ Build
+        run: npm run typecheck

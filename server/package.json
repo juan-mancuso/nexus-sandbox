@@ -1,0 +1,18 @@
+{
+	"name": "sdk-server",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "NODE_ENV=dev node index.js",
+		"build": "node ../esbuild.config.js",
+		"deploy": "npx serverless deploy"
+	},
+	"dependencies": {
+		"express": "^4.19.2",
+		"serverless-http": "^3.2.0",
+		"swagger-ui-express": "^5.0.0"
+	},
+	"devDependencies": {
+		"esbuild": "^0.24.0"
+	}
+}

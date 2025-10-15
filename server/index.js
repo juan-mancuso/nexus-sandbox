@@ -20,7 +20,7 @@ export default app;
 
 // For local testing
 if (process.env.NODE_ENV !== 'lambda') {
-	const port = process.env.PORT || 3000;
+	const port = process.env.PORT || 3001;
 	app.listen(port, () => {
 		console.log(`✅ Server running on http://localhost:${port}`);
 		console.log(`📄 Swagger UI available at http://localhost:${port}/docs`);

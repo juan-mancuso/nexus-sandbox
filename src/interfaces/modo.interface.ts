@@ -1,6 +1,6 @@
 export type ModoMerchant = {
 	token: string; // Bearer token (JWT)
-	expiresIn?: number;
+	expiresIn?: number | undefined;
 };
 
 export interface ModoTokenResponse {

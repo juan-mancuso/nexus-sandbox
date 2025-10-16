@@ -30,3 +30,29 @@ export function validationFormat(format: any) {
 export function isValidStatusCode(statusCode: unknown): boolean {
 	return !!statusCode && typeof statusCode === 'number' && statusCode >= 100 && statusCode < 600;
 }
+
+/**
+ * Validate amount: up to 13 characters total, with up to 2 decimal places.
+ * Accepts number or string.
+ */
+export function isValidAmount(amount: number | string): boolean {
+	if (amount === null || amount === undefined) return false;
+	const str = typeof amount === 'number' ? amount.toFixed(2) : String(amount);
+	// Allow up to 11 digits before decimal and up to 2 decimals => 13 chars max
+	const regex = /^\d{1,11}(\.\d{1,2})?$/;
+	return regex.test(str);
+}
+
+/**
+ * Validate expiration date: must be ISO8601 and between 5 and 10 minutes in the future (if provided).
+ */
+export function isValidExpirationDate(expiration?: string): boolean {
+	if (!expiration) return true; // optional
+	const date = new Date(expiration);
+	if (Number.isNaN(date.getTime())) return false;
+	const now = Date.now();
+	const diff = date.getTime() - now;
+	const min = 5 * 60 * 1000; // 5 minutes
+	const max = 10 * 60 * 1000; // 10 minutes
+	return diff >= min && diff <= max;
+}

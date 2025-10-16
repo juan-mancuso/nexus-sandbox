@@ -87,10 +87,12 @@ export default class PaymentRequestService {
 	merchant: ModoMerchant;
 
 	constructor(token: string, expires_in?: number) {
-		this.merchant = {
-			token,
-			expires_in
-		};
+		// Build merchant object without assigning undefined to exact-optional properties
+		const m: ModoMerchant = { token };
+		if (expires_in !== undefined) {
+			m.expires_in = expires_in;
+		}
+		this.merchant = m;
 	}
 
 	createTransaction = (payload: CreatePaymentRequest) => createTransaction(this.merchant, payload);

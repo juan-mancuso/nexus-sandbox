@@ -82,7 +82,11 @@ export default class PaymentRequestService {
 	merchant: ModoMerchant;
 
 	constructor(token: string, expires_in?: number) {
-		this.merchant = { token, expires_in };
+		if (typeof expires_in !== 'undefined') {
+			this.merchant = { token, expires_in } as ModoMerchant;
+		} else {
+			this.merchant = { token } as ModoMerchant;
+		}
 	}
 
 	createTransaction = (payload: CreateModoPaymentRequest) => createTransaction(this.merchant, payload);

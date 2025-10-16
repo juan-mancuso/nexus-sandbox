@@ -1,18 +1,41 @@
-import TransactionService from './transaction.service';
-import { generateToken, handleError } from '../utils/utilsService';
+import { getAppConfig } from '../config';
+import { handleError } from '../utils/utilsService';
+import { Logger } from '../utils/logger';
+import { HttpService } from '../utils/httpService';
+import { ModoTokenResponse, ModoMerchant } from '../interfaces/modo.interface';
 
-const authenticate = async (apiKey: string, secretKey: string) => {
+const authenticate = async (username: string, password: string): Promise<ModoMerchant> => {
+	const { apiUrl, debug, userAgent } = getAppConfig();
+
+	const headers = {
+		'User-Agent': `${userAgent}`,
+		'Content-Type': 'application/json'
+	};
+
+	const httpService = new HttpService('v2/stores/companies', {
+		baseURL: `${apiUrl}/`,
+		headers
+	});
+
 	try {
-		const token = generateToken(apiKey, secretKey);
+		const response = await httpService.post<ModoTokenResponse>('/token', { data: { username, password } });
 
-		const service = new TransactionService(token);
-		const response = await service.getTransactions();
-
-		if (!response || !response.items) {
-			throw new Error('Invalid credentials');
+		if (debug) {
+			Logger.info(response);
 		}
 
-		return token;
+		const data = response.data;
+
+		if (!data || !data.access_token) {
+			throw new Error('Invalid credentials: access_token not returned');
+		}
+
+		const merchant: ModoMerchant = {
+			token: data.access_token,
+			expiresIn: data.expires_in
+		};
+
+		return merchant;
 	} catch (error) {
 		return handleError(error);
 	}

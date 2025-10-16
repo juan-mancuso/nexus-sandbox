@@ -1,0 +1,129 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SDK Playground API",
+    "version": "1.0.0",
+    "description": "Auto-generated OpenAPI spec for the SDK endpoints exposed under /api"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {
+    "/api/authenticate": {
+      "post": {
+        "summary": "Authenticate with Modo",
+        "description": "Authenticate using username and password. Returns a merchant object containing an access token and optional expiresIn value.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": { "type": "string", "example": "store_user" },
+                  "password": { "type": "string", "example": "s3cr3t" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentication successful — returns merchant token information.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModoMerchant"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/getAppConfig": {
+      "post": {
+        "summary": "Get SDK configuration",
+        "description": "Returns the current SDK configuration (apiUrl, debug, userAgent, env). Request body is ignored.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": { "type": "object" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current SDK configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppConfig"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/setAppConfig": {
+      "post": {
+        "summary": "Set SDK configuration",
+        "description": "Updates the SDK configuration. Accepts a partial AppConfig object and returns the updated configuration.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "apiUrl": { "type": "string", "example": "https://api-gw.payclip.com" },
+                  "debug": { "type": "boolean", "example": true },
+                  "userAgent": { "type": "string", "example": "Example SDK" },
+                  "env": { "type": "string", "example": "development" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated SDK configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppConfig"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ModoMerchant": {
+        "type": "object",
+        "properties": {
+          "token": { "type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." },
+          "expiresIn": { "type": "number", "nullable": true, "example": 3600 }
+        }
+      },
+      "AppConfig": {
+        "type": "object",
+        "properties": {
+          "apiUrl": { "type": "string", "example": "https://api-gw.payclip.com" },
+          "debug": { "type": "boolean", "example": true },
+          "userAgent": { "type": "string", "example": "Example SDK" },
+          "env": { "type": "string", "example": "development" }
+        }
+      }
+    }
+  }
+}

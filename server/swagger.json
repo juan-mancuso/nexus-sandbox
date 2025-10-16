@@ -1,0 +1,386 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SDK Playground API",
+    "version": "1.0.0",
+    "description": "Auto-generated OpenAPI spec for the SDK endpoints exposed under /api"
+  },
+  "paths": {
+    "/api/authenticate": {
+      "post": {
+        "summary": "Authenticate (username/password)",
+        "description": "Authenticates against the Modo API and returns a merchant object containing a bearer token and expires_in.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthenticateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentication successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticateResponseWrapper"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/createTransaction": {
+      "post": {
+        "summary": "Create payment request",
+        "description": "Creates a Modo payment request. Requires a merchant token and the payment payload.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTransactionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created payment request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateTransactionResponseWrapper"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/getTransaction": {
+      "post": {
+        "summary": "Get payment request data",
+        "description": "Retrieves payment request information and transaction data from Modo. Requires merchant token and paymentRequestId.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetTransactionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment request data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTransactionResponseWrapper"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/refundTransaction": {
+      "post": {
+        "summary": "Refund payment request",
+        "description": "Performs a refund for a payment request. If amount is omitted a full refund is attempted.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefundTransactionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Refund response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundTransactionResponseWrapper"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cancelTransaction": {
+      "post": {
+        "summary": "Cancel payment request",
+        "description": "Cancels a payment request by issuing a full refund (Modo does not expose a dedicated cancel endpoint).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelTransactionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cancel (refund) response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelTransactionResponseWrapper"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/getAppConfig": {
+      "post": {
+        "summary": "Get SDK configuration",
+        "description": "Returns the SDK runtime configuration (apiUrl, env, debug, userAgent).",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "No body required"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "App configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAppConfigResponseWrapper"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/setAppConfig": {
+      "post": {
+        "summary": "Set SDK configuration",
+        "description": "Updates the SDK runtime configuration. Accepts partial configuration object and returns the updated configuration.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetAppConfigRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated app configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAppConfigResponseWrapper"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AuthenticateRequest": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string" },
+          "password": { "type": "string" }
+        },
+        "required": ["username", "password"]
+      },
+      "ModoMerchant": {
+        "type": "object",
+        "properties": {
+          "token": { "type": "string" },
+          "expires_in": { "type": "number" }
+        }
+      },
+      "AuthenticateResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": { "type": "string" },
+          "token_type": { "type": "string" },
+          "expires_in": { "type": "number" }
+        }
+      },
+      "AuthenticateResponseWrapper": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "data": { "$ref": "#/components/schemas/ModoMerchant" }
+        }
+      },
+
+      "CreateTransactionRequest": {
+        "type": "object",
+        "properties": {
+          "token": { "type": "string", "description": "Merchant Bearer token" },
+          "expires_in": { "type": "number" },
+          "payload": {
+            "type": "object",
+            "properties": {
+              "description": { "type": "string" },
+              "amount": { "oneOf": [{ "type": "number" }, { "type": "string" }] },
+              "currency": { "type": "string" },
+              "cc_code": { "type": "string" },
+              "processor_code": { "type": "string" },
+              "external_intention_id": { "type": "string" },
+              "expiration_date": { "type": "string", "format": "date-time" },
+              "message": { "type": "string" },
+              "webhook_notification": { "type": "string" },
+              "customer": { "type": "object" },
+              "shipping_address": { "type": "object" },
+              "items": { "type": "array", "items": { "type": "object" } },
+              "establishment_numbers": { "type": "array", "items": { "type": "string" } }
+            },
+            "required": ["description", "amount", "currency", "cc_code", "processor_code", "external_intention_id"]
+          }
+        },
+        "required": ["token", "payload"]
+      },
+
+      "CreateTransactionResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "qr": { "type": "string" },
+          "deeplink": { "type": "string" },
+          "created_at": { "type": "string" },
+          "expiration_at": { "type": "string" },
+          "expiration_date": { "type": "string" }
+        },
+        "additionalProperties": true
+      },
+      "CreateTransactionResponseWrapper": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "data": { "$ref": "#/components/schemas/CreateTransactionResponse" }
+        }
+      },
+
+      "GetTransactionRequest": {
+        "type": "object",
+        "properties": {
+          "token": { "type": "string" },
+          "paymentRequestId": { "type": "string" }
+        },
+        "required": ["token", "paymentRequestId"]
+      },
+
+      "GetTransactionResponse": {
+        "type": "object",
+        "properties": {
+          "payment_request": { "type": "object" },
+          "transaction_data": { "type": "object" }
+        },
+        "additionalProperties": true
+      },
+      "GetTransactionResponseWrapper": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "data": { "$ref": "#/components/schemas/GetTransactionResponse" }
+        }
+      },
+
+      "RefundTransactionRequest": {
+        "type": "object",
+        "properties": {
+          "token": { "type": "string" },
+          "paymentRequestId": { "type": "string" },
+          "amount": { "oneOf": [{ "type": "number" }, { "type": "string" }] }
+        },
+        "required": ["token", "paymentRequestId"]
+      },
+
+      "RefundTransactionResponse": {
+        "type": "object",
+        "properties": {
+          "amount": { "oneOf": [{ "type": "number" }, { "type": "string" }] },
+          "status": { "type": "string" },
+          "reference_transaction_token": { "type": "string" },
+          "currency": { "type": "string" },
+          "message": { "type": "string" }
+        },
+        "additionalProperties": true
+      },
+      "RefundTransactionResponseWrapper": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "data": { "$ref": "#/components/schemas/RefundTransactionResponse" }
+        }
+      },
+
+      "CancelTransactionRequest": {
+        "type": "object",
+        "properties": {
+          "token": { "type": "string" },
+          "paymentRequestId": { "type": "string" }
+        },
+        "required": ["token", "paymentRequestId"]
+      },
+      "CancelTransactionResponseWrapper": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "data": { "$ref": "#/components/schemas/RefundTransactionResponse" }
+        }
+      },
+
+      "SetAppConfigRequest": {
+        "type": "object",
+        "properties": {
+          "apiUrl": { "type": "string" },
+          "env": { "type": "string" },
+          "debug": { "type": "boolean" },
+          "userAgent": { "type": "string" }
+        }
+      },
+
+      "GetAppConfigResponse": {
+        "type": "object",
+        "properties": {
+          "apiUrl": { "type": "string" },
+          "debug": { "type": "boolean" },
+          "userAgent": { "type": "string" },
+          "env": { "type": "string" }
+        }
+      },
+      "GetAppConfigResponseWrapper": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "data": { "$ref": "#/components/schemas/GetAppConfigResponse" }
+        }
+      }
+    }
+  }
+}

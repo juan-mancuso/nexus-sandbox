@@ -13,6 +13,16 @@ export function getHeaders(token: string) {
 	};
 }
 
+export function getBearerHeaders(token: string) {
+	const { userAgent } = getAppConfig();
+
+	return {
+		Authorization: `Bearer ${token}`,
+		'User-Agent': `${userAgent}`,
+		'Content-Type': 'application/json'
+	};
+}
+
 export const handleError = (error: any) => {
 	const { debug } = getAppConfig();
 

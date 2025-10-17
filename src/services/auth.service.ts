@@ -1,18 +1,29 @@
-import TransactionService from './transaction.service';
-import { generateToken, handleError } from '../utils/utilsService';
+import { getAppConfig } from '../config';
+import { handleError } from '../utils/utilsService';
+import { Logger } from '../utils/logger';
+import { HttpService } from '../utils/httpService';
+import { ModoTokenResponse } from '../interfaces/modo.interface';
 
-const authenticate = async (apiKey: string, secretKey: string) => {
+const authenticate = async (username: string, password: string): Promise<ModoTokenResponse> => {
+	const { apiUrl, debug, userAgent } = getAppConfig();
+	const headers = {
+		'User-Agent': `${userAgent}`,
+		'Content-Type': 'application/json'
+	};
+
+	const httpService = new HttpService('v2/stores/companies', {
+		baseURL: `${apiUrl}/`,
+		headers
+	});
+
 	try {
-		const token = generateToken(apiKey, secretKey);
+		const response = await httpService.post<ModoTokenResponse>('token', { data: { username, password } });
 
-		const service = new TransactionService(token);
-		const response = await service.getTransactions();
-
-		if (!response || !response.items) {
-			throw new Error('Invalid credentials');
+		if (debug) {
+			Logger.info(response);
 		}
 
-		return token;
+		return response.data;
 	} catch (error) {
 		return handleError(error);
 	}

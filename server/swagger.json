@@ -1,0 +1,291 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SDK Playground API",
+    "version": "1.0.0",
+    "description": "Auto-generated OpenAPI spec exposing SDK PaymentRequest operations as REST endpoints."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/api/createTransaction": {
+      "post": {
+        "summary": "Create Payment Request",
+        "description": "Creates a payment request. Provide merchant token and payment payload.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": { "type": "string", "description": "Merchant Bearer token" },
+                  "payload": { "$ref": "#/components/schemas/CreatePaymentRequest" }
+                },
+                "required": ["token", "payload"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment request created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": { "type": "boolean" },
+                    "data": { "$ref": "#/components/schemas/CreatePaymentResponse" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/getTransaction": {
+      "post": {
+        "summary": "Get Payment Request Data",
+        "description": "Retrieves payment request and transaction data.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": { "type": "string" },
+                  "paymentRequestId": { "type": "string" }
+                },
+                "required": ["token", "paymentRequestId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment request data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": { "type": "boolean" },
+                    "data": { "$ref": "#/components/schemas/GetPaymentResponse" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/refundTransaction": {
+      "post": {
+        "summary": "Refund Payment Request",
+        "description": "Refund a payment request. If no amount provided, full refund is requested.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": { "type": "string" },
+                  "paymentRequestId": { "type": "string" },
+                  "body": { "$ref": "#/components/schemas/RefundRequest" }
+                },
+                "required": ["token", "paymentRequestId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Refund response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": { "type": "boolean" },
+                    "data": { "$ref": "#/components/schemas/RefundResponse" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cancelTransaction": {
+      "post": {
+        "summary": "Cancel Payment Request (full refund)",
+        "description": "Cancels a payment request by requesting a full refund (Modo does not expose a dedicated cancel endpoint).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": { "type": "string" },
+                  "paymentRequestId": { "type": "string" }
+                },
+                "required": ["token", "paymentRequestId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cancel (refund) response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": { "type": "boolean" },
+                    "data": { "$ref": "#/components/schemas/RefundResponse" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Address": {
+        "type": "object",
+        "properties": {
+          "state": { "type": "string" },
+          "city": { "type": "string" },
+          "zip_code": { "type": "string" },
+          "street": { "type": "string" },
+          "number": { "type": "string" }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "full_name": { "type": "string" },
+          "email": { "type": "string" },
+          "identification": { "type": "string" },
+          "birth_date": { "type": "string", "format": "date" },
+          "phone": { "type": "string" },
+          "id": { "type": "string" },
+          "invoice_address": { "$ref": "#/components/schemas/Address" }
+        }
+      },
+      "Item": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "description": { "type": "string" },
+          "quantity": { "type": "number" },
+          "unit_price": { "type": "number" },
+          "amount": { "type": "number" }
+        }
+      },
+      "CreatePaymentRequest": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string" },
+          "amount": { "type": "number" },
+          "currency": { "type": "string" },
+          "cc_code": { "type": "string" },
+          "processor_code": { "type": "string" },
+          "external_intention_id": { "type": "string" },
+          "expiration_date": { "type": "string", "format": "date-time" },
+          "message": { "type": "string" },
+          "webhook_notification": { "type": "string" },
+          "customer": { "$ref": "#/components/schemas/Customer" },
+          "shipping_address": { "$ref": "#/components/schemas/Address" },
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Item" }
+          },
+          "establishment_numbers": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["description", "amount", "currency", "cc_code", "processor_code", "external_intention_id"]
+      },
+      "BestInstallment": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "number" },
+          "installment_value": { "type": "number" },
+          "total": { "type": "number" }
+        }
+      },
+      "SubPayment": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "amount": { "type": "number" },
+          "status": { "type": "string" }
+        }
+      },
+      "CreatePaymentResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "qr": { "type": "string" },
+          "deeplink": { "type": "string" },
+          "created_at": { "type": "string" },
+          "expiration_at": { "type": "string" },
+          "expiration_date": { "type": "string" },
+          "sub_payments": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/SubPayment" }
+          },
+          "best_installment": { "$ref": "#/components/schemas/BestInstallment" }
+        }
+      },
+      "TransactionData": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string" },
+          "amount": { "type": "number" },
+          "currency": { "type": "string" },
+          "reference": { "type": "string" },
+          "transaction_token": { "type": "string" }
+        }
+      },
+      "GetPaymentResponse": {
+        "type": "object",
+        "properties": {
+          "payment_request": { "$ref": "#/components/schemas/CreatePaymentResponse" },
+          "transaction_data": { "$ref": "#/components/schemas/TransactionData" }
+        }
+      },
+      "RefundRequest": {
+        "type": "object",
+        "properties": {
+          "amount": { "type": "number", "description": "Amount to refund. If omitted, full refund is requested." }
+        }
+      },
+      "RefundResponse": {
+        "type": "object",
+        "properties": {
+          "amount": { "type": "number" },
+          "status": { "type": "string" },
+          "reference_transaction_token": { "type": "string" },
+          "currency": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  }
+}

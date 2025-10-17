@@ -1,0 +1,198 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SDK Playground API",
+    "version": "1.0.0",
+    "description": "Auto-generated OpenAPI spec for SDK endpoints (authenticate and payment-request operations)."
+  },
+  "paths": {
+    "/api/authenticate": {
+      "post": {
+        "summary": "Authenticate merchant",
+        "description": "Authenticates merchant credentials and returns a bearer token (ModoMerchant).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentication result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": { "type": "boolean" },
+                    "data": {
+                      "$ref": "#/components/schemas/ModoMerchant"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/createTransaction": {
+      "post": {
+        "summary": "Create a payment request",
+        "description": "Creates a payment request (transaction). Provide merchant bearer token and payload.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["token", "payload"],
+                "properties": {
+                  "token": { "type": "string", "description": "Bearer token for merchant" },
+                  "payload": { "$ref": "#/components/schemas/CreatePaymentRequest" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created payment request",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "ok": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/CreatePaymentResponse" } } }
+              }
+            }
+          },
+          "500": { "description": "Server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/api/getTransaction": {
+      "post": {
+        "summary": "Get payment request details",
+        "description": "Retrieves information about a payment request. Provide token and paymentRequestId.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "type": "object", "required": ["token","paymentRequestId"], "properties": { "token": { "type": "string" }, "paymentRequestId": { "type": "string" } } }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Payment request data", "content": { "application/json": { "schema": { "type": "object", "properties": { "ok": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/GetPaymentResponse" } } } } } },
+          "500": { "description": "Server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/api/refundTransaction": {
+      "post": {
+        "summary": "Refund a payment request",
+        "description": "Performs a refund. Omit amount for a full refund or provide a number for partial refund.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "type": "object", "required": ["token","paymentRequestId"], "properties": { "token": { "type": "string" }, "paymentRequestId": { "type": "string" }, "amount": { "type": "number" } } }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Refund result", "content": { "application/json": { "schema": { "type": "object", "properties": { "ok": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/RefundResponse" } } } } } },
+          "500": { "description": "Server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+    "/api/cancelTransaction": {
+      "post": {
+        "summary": "Cancel a payment (full refund)",
+        "description": "Convenience wrapper that performs a full refund for given paymentRequestId.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "type": "object", "required": ["token","paymentRequestId"], "properties": { "token": { "type": "string" }, "paymentRequestId": { "type": "string" } } }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Cancel (refund) result", "content": { "application/json": { "schema": { "type": "object", "properties": { "ok": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/RefundResponse" } } } } } },
+          "500": { "description": "Server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ModoMerchant": {
+        "type": "object",
+        "properties": {
+          "token": { "type": "string" },
+          "tokenType": { "type": "string" },
+          "expiresIn": { "type": "number" }
+        }
+      },
+      "CreatePaymentRequest": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string" },
+          "amount": { "type": "number" },
+          "currency": { "type": "string" },
+          "cc_code": { "type": "string" },
+          "processor_code": { "type": "string" },
+          "external_intention_id": { "type": "string" },
+          "expiration_date": { "type": "string", "format": "date-time" },
+          "message": { "type": "string" },
+          "webhook_notification": { "type": "string" }
+        }
+      },
+      "CreatePaymentResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "qr": { "type": "string" },
+          "deeplink": { "type": "string" },
+          "created_at": { "type": "string" }
+        }
+      },
+      "GetPaymentResponse": {
+        "type": "object",
+        "properties": {
+          "payment_request": { "$ref": "#/components/schemas/CreatePaymentResponse" },
+          "transaction_data": { "type": "object" }
+        }
+      },
+      "RefundResponse": {
+        "type": "object",
+        "properties": {
+          "amount": { "type": "number" },
+          "status": { "type": "string" },
+          "reference_transaction_token": { "type": "string" },
+          "currency": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "error": { "type": "string" }
+        }
+      }
+    }
+  }
+}
